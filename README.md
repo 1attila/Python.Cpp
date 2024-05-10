@@ -7,9 +7,11 @@ Some examples can be found in the `Python.cpp` file.
 
 ## Supported utilities
 ### Pythonic functions
- - `py::print()` can print one or more items of the same type. Like python supports `sep`, `end` and `flush` parameters except for `file` (coming soon).
+ - `py::print()` can print one or more items of the same type. Like python supports `sep`, `end` and `flush` parameters except for `file` (coming soon). Supports and automatically calls  
+     `__repr__()` method if an object has one.
  - `py::assert()` stops the program execution if the provided condition is false. Assertion Behavior can be changed by changing `py::DefaultAssertionFunctionPtr` reference.
  - `py::len()` and ` lenght()` works with every object which has either `lenght()` or `__len__()` methods. `len()` returns an integer while `lenght()` returns size_t.
+ - `py::Exception` if initialized with a error message (`raise py::Exception("Bad error"))` they will print it by default when printing the exception (`print(e)`)
 
 ## Coming soon
  - Pytonic file system
