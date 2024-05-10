@@ -11,7 +11,6 @@ Current features:
 #include <iostream>
 #include <string>
 #include <vector>
-#include <stdlib.h>
 #include <fstream>
 #include <initializer_list>
 
@@ -76,28 +75,42 @@ namespace py
     // -------------- //
     // --Exceptions-- //
     // -------------- //
-    class ValueError : std::exception
+
+    // Base exception class
+    class Exception : public std::exception
     {
     public:
+        std::string ErrMsg = "";
+        Exception(std::string errMSg="") {this->ErrMsg = errMSg;}
+        std::string __repr__(){return this->ErrMsg;}
+    };
 
-        ValueError(std::string errMsg="")
-        {
-            std::cout << errMsg << std::endl;
-        }
+    // Assertion failed
+    class AssertionError : public Exception
+    {
+    public:
+        AssertionError(std::string errMsg="") {this->ErrMsg = errMsg;}
+    };
+
+    // Wrong argument value of correct type
+    class ValueError : public Exception
+    {
+    public:
+        ValueError(std::string errMsg="") {this->ErrMsg = errMsg;}
     };
 
     // ----------------------- //
     // --Customization utils-- //
     // ----------------------- //
     
-    void defaultAssertionFunction(std::string message)
+    std::string defaultAssertionFunction(std::string message)
     {
         std::string p_message = message.length() != 0 ? ": " + message : "";
 
-        std::cout << "AssertionError" << p_message << std::endl;
+        return std::string("AssertionError") + p_message;
     }
 
-    void (*DefaultAssertionFunctionPtr) (std::string) = defaultAssertionFunction;
+    std::string (*DefaultAssertionFunctionPtr) (std::string) = defaultAssertionFunction;
 
     // -------------------------- //
     // --Pythonic c++ utilities-- //
@@ -137,11 +150,11 @@ namespace py
     }
 
     // Python assert keyword
+    // Raises an AssertionError if the  condition provided is false
     void assert(bool flag, std::string message="")
     {
         if ( !flag)
-            DefaultAssertionFunctionPtr(message);
-            exit(1);
+            throw AssertionError(DefaultAssertionFunctionPtr(message));
     }
 
     // Pythonic len() function for C++
@@ -178,14 +191,15 @@ namespace py
 
     // Work in progress
     // File system
-    /*
-    class File
+    
+    // Wrapper class to work with files
+    /* class File
     {
     public:
         FILE file = nullptr;
         OpeningMode mode = nullptr;
 
-        File(FILE* &file, OpeningMode mode=nullptr)
+        File(FILE* &file, OpeningMode mode)
         {
             this->file = file;
             this->mode = mode;
@@ -208,8 +222,7 @@ namespace py
         PLUS = 6
     };
 
-    template<MODE>
-    File open(std::string path, MODE mode=OpeningMode::R)
+    File open(std::string path, OpeningMode mode=OpeningMode::R)
     {   
         FILE* file = nullptr
 
@@ -217,10 +230,9 @@ namespace py
             file = &fopen(path, _ios_base::in | _ios::binary);
         else
             file = &fopen(path, _ios_base::in);
-    }
-    */
 
-
+        return File(file, mode);
+    } */
 }
 
 #endif
